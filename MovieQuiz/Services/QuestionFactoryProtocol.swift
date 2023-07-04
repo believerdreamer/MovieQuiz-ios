@@ -1,5 +1,7 @@
 import UIKit
 
-protocol QuestionFactoryProtocol{
+protocol QuestionFactoryProtocol {
     func requestNextQuestion()
+
+    func loadData()
 }

@@ -3,7 +3,7 @@
     <device id="retina5_9" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21679"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -106,14 +106,19 @@
                                     </stackView>
                                 </subviews>
                             </stackView>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="large" translatesAutoresizingMaskIntoConstraints="NO" id="Yll-fK-ZS8">
+                                <rect key="frame" x="169" y="387.66666666666669" width="37" height="37"/>
+                            </activityIndicatorView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black"/>
                         <constraints>
                             <constraint firstItem="yy8-WZ-ATU" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="8tG-Zt-YLz"/>
                             <constraint firstItem="yy8-WZ-ATU" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="10" id="KWb-eZ-Wat"/>
+                            <constraint firstItem="Yll-fK-ZS8" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="eBT-3M-9y7"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="yy8-WZ-ATU" secondAttribute="bottom" id="rP8-Il-uJw"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="yy8-WZ-ATU" secondAttribute="trailing" constant="20" id="sOS-0S-2tx"/>
+                            <constraint firstItem="Yll-fK-ZS8" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="vGF-eZ-MWQ"/>
                         </constraints>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
@@ -122,6 +127,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <connections>
+                        <outlet property="activityIndicator" destination="Yll-fK-ZS8" id="66T-mT-tjp"/>
                         <outlet property="counterLabel" destination="YYQ-b8-Dso" id="o7I-f0-fmY"/>
                         <outlet property="imageView" destination="kUw-Jz-C0V" id="rpE-HA-QHm"/>
                         <outlet property="noButton" destination="GqU-Ex-DT1" id="Qoi-Hm-cVg"/>
