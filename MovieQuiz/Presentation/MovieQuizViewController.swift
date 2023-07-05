@@ -57,11 +57,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 guard let self = self else {return}
                 showLoadingIndicator()
                 blurEffect.isHidden = false
-                self.currentQuestionIndex = 0
-                self.correctAnswers = 0
-                self.didLoadDataFromServer()
                 questionFactory?.loadData()
-                self.questionFactory?.requestNextQuestion()
             }
         )
         alertPresenter?.show(alertModel: networkErrorAlert)
