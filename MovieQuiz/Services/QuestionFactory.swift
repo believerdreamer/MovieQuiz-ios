@@ -1,7 +1,7 @@
 import UIKit
 
 final class QuestionFactory: QuestionFactoryProtocol {
-
+    // MARK: Private properties:
     private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
     private var movies: [MostPopularMovie] = []
@@ -20,7 +20,7 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
-
+    // MARK: Public methods:
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
@@ -37,11 +37,6 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
 
             let rating = Float(movie.rating) ?? 0
-
-//            let ratingQuestion = round(Float.random(in: 7.3...9.7) * 10) / 10
-//            let text = "Рейтинг этого фильма больше чем \(ratingQuestion)?"
-//            let correctAnswer = rating > ratingQuestion
-//
             let ratingQuestion = round(Float.random(in: 7.3...9.7) * 10) / 10
             let text: String
             let correctAnswer: Bool
