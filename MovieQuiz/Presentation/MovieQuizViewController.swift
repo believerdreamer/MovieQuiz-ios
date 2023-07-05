@@ -7,6 +7,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet weak var blurEffect: UIVisualEffectView!
     @IBOutlet private var imageView: UIImageView!
 
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -30,11 +31,13 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
+        blurEffect.isHidden = false
     }
 
     private func hideLoadingIndicator() {
         activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
+        blurEffect.isHidden = true
     }
     private func showNetworkError(message: String) {
         hideLoadingIndicator()
@@ -48,7 +51,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 self.correctAnswers = 0
                 self.questionFactory?.requestNextQuestion()
                 showLoadingIndicator()
-                
             }
 
         )
@@ -153,6 +155,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     func didLoadDataFromServer() {
         activityIndicator.isHidden = true
+        blurEffect.isHidden = true
         questionFactory?.requestNextQuestion()
     }
 
