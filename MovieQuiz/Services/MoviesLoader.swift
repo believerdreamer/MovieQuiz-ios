@@ -5,7 +5,7 @@ protocol MoviesLoading {
 }
 
 struct MoviesLoader: MoviesLoading {
-
+    // MARK: Private properties:
     private let networkClient = NetworkClient()
 
     private var mostPopularMoviesUrl: URL {
@@ -14,7 +14,7 @@ struct MoviesLoader: MoviesLoading {
         }
         return url
     }
-
+    // MARK: Public methods:
     func loadMovies(handler: @escaping (Result<MostPopularMovies, Error>) -> Void) {
 
         networkClient.fetch(url: mostPopularMoviesUrl) { result in
