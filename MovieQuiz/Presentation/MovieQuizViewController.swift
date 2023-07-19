@@ -33,8 +33,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var statisticService: StatisticService?
 
     // MARK: Public properties:
-    
-    var correctAnswers: Int = 0
 
     // MARK: Private methods:
     func showLoadingIndicator() {
@@ -58,6 +56,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 showLoadingIndicator()
                 blurEffect.isHidden = false
                 questionFactory?.loadData()
+                self.presenter.restartGame()
             }
         )
         alertPresenter?.show(alertModel: networkErrorAlert)
@@ -71,15 +70,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
 
     func showAnswerResult(isCorrect: Bool) {
-        if isCorrect {
-            correctAnswers += 1
-        }
+//        presenter.didAnswer(isYes: isCorrect)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else {return}
-            self.presenter.correctAnswers = self.correctAnswers
             self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
             self.imageView.layer.borderWidth = 0
@@ -93,15 +89,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         blurEffect.isHidden = false
         activityIndicator.stopAnimating()
         activityIndicator.isHidden = true
-        statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
+        statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
         let alertModel = AlertModel(
             title: "Этот раунд окончен!",
             message: makeResultMessage(),
             buttonText: "Сыграть ещё раз",
             completion: { [weak self] in
                 self?.presenter.currentQuestionIndex = 0
-                self?.correctAnswers = 0
+                self?.presenter.correctAnswers = 0
                 self?.questionFactory?.requestNextQuestion()
+                self?.presenter.restartGame()
             }
         )
         alertPresenter?.show(alertModel: alertModel)
