@@ -1,12 +1,28 @@
 import UIKit
 
-final class MovieQuizPresenter {
-    //MARK: Properies:
+final class MovieQuizPresenter: QuestionFactoryDelegate {
+    func didLoadDataFromServer() {
+        viewController?.activityIndicator.isHidden = false
+        viewController?.blurEffect.isHidden = false
+        questionFactory?.requestNextQuestion()
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        viewController?.showNetworkError(message: error.localizedDescription)   
+    }
+    
+    //MARK: Properties:
+    private weak var viewController: MovieQuizViewController?
+    var questionFactory: QuestionFactoryProtocol?
+    
+    init(viewController: MovieQuizViewController) {
+        self.viewController = viewController
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        viewController.showLoadingIndicator()
+    }
     let questionsAmount: Int = 10
     var currentQuestionIndex: Int = 0
     var currentQuestion: QuizQuestion?
-    weak var viewController: MovieQuizViewController?
-    var questionFactory: QuestionFactoryProtocol?
     var correctAnswers: Int = 0
     
     // MARK: Functions:
@@ -25,6 +41,7 @@ final class MovieQuizPresenter {
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
+        questionFactory?.requestNextQuestion()
     }
         
     func switchToNextQuestion() {

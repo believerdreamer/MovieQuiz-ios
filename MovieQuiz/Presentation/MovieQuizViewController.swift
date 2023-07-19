@@ -1,7 +1,7 @@
 import UIKit
 
 // MARK: UIViewController
-final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+final class MovieQuizViewController: UIViewController {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
     }
@@ -26,9 +26,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
 
     // MARK: Private properties:
-    private let presenter = MovieQuizPresenter()
+    private var presenter: MovieQuizPresenter!
     
-    private var questionFactory: QuestionFactoryProtocol?
     private var alertPresenter: AlertPresenter?
     private var statisticService: StatisticService?
 
@@ -41,12 +40,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         blurEffect.isHidden = false
     }
 
-    private func hideLoadingIndicator() {
+    func hideLoadingIndicator() {
         activityIndicator.isHidden = true
         activityIndicator.stopAnimating()
         blurEffect.isHidden = true
     }
-    private func showNetworkError(message: String) {
+    func showNetworkError(message: String) {
         let networkErrorAlert = AlertModel(
             title: "Что-то пошло не так(",
             message: "Невозможно загрузить данные",
@@ -55,7 +54,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 guard let self = self else {return}
                 showLoadingIndicator()
                 blurEffect.isHidden = false
-                questionFactory?.loadData()
+                presenter.questionFactory?.loadData()
                 self.presenter.restartGame()
             }
         )
@@ -70,13 +69,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
 
     func showAnswerResult(isCorrect: Bool) {
-//        presenter.didAnswer(isYes: isCorrect)
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else {return}
-            self.presenter.questionFactory = self.questionFactory
             self.presenter.showNextQuestionOrResults()
             self.imageView.layer.borderWidth = 0
             
@@ -97,7 +94,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             completion: { [weak self] in
                 self?.presenter.currentQuestionIndex = 0
                 self?.presenter.correctAnswers = 0
-                self?.questionFactory?.requestNextQuestion()
                 self?.presenter.restartGame()
             }
         )
@@ -122,29 +118,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
        }
 
     }
-    // MARK: Public methods:
-    func didLoadDataFromServer() {
-        activityIndicator.isHidden = false
-        blurEffect.isHidden = false
-        questionFactory?.requestNextQuestion()
-    }
-
-    func didFailToLoadData(with error: Error) {
-        showNetworkError(message: error.localizedDescription)
-    }
-
-
 
     // MARK: Lifecycle:
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter.viewController = self
+        presenter = MovieQuizPresenter(viewController: self)
         imageView.layer.cornerRadius = 20
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         alertPresenter = AlertPresenter(viewController: self)
         statisticService = StatisticServiceImpl()
-        questionFactory?.requestNextQuestion()
-        questionFactory?.loadData()
+        presenter.questionFactory?.requestNextQuestion()
+        presenter.questionFactory?.loadData()
 
     }
 
