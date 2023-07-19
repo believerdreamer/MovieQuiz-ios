@@ -1,22 +1,34 @@
 import UIKit
 
-// MARK: UIViewController
-final class MovieQuizViewController: UIViewController {
-    func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
-    }
-    
+// MARK: UIViewController:
 
+final class MovieQuizViewController: UIViewController {
     // MARK: IBOutlet:
+    
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet weak var noButton: UIButton!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet weak var blurEffect: UIVisualEffectView!
-    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet var imageView: UIImageView!
+    private var alertPresenter: AlertPresenter?
+    private var presenter: MovieQuizPresenter!
+    
+    // MARK: Lifecycle:
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        presenter = MovieQuizPresenter(viewController: self)
+        alertPresenter = AlertPresenter(viewController: self)
+        presenter.statisticService = StatisticServiceImpl()
+        presenter.questionFactory?.requestNextQuestion()
+        presenter.questionFactory?.loadData()
 
-    // MARK: IBAction:
+    }
+    
+    // MARK: Actions:
+    
     @IBAction private func noButtonClicked(_ sender: Any) {
         presenter.noButtonClicked()
     }
@@ -25,15 +37,7 @@ final class MovieQuizViewController: UIViewController {
         presenter.yesButtonClicked()
     }
 
-    // MARK: Private properties:
-    private var presenter: MovieQuizPresenter!
-    
-    private var alertPresenter: AlertPresenter?
-    private var statisticService: StatisticService?
-
-    // MARK: Public properties:
-
-    // MARK: Private methods:
+    // MARK: Functions:
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
@@ -52,10 +56,9 @@ final class MovieQuizViewController: UIViewController {
             buttonText: "Попробовать ещё раз",
             completion: {[weak self] in
                 guard let self = self else {return}
-                showLoadingIndicator()
-                blurEffect.isHidden = false
                 presenter.questionFactory?.loadData()
                 self.presenter.restartGame()
+                showLoadingIndicator()
             }
         )
         alertPresenter?.show(alertModel: networkErrorAlert)
@@ -67,29 +70,14 @@ final class MovieQuizViewController: UIViewController {
         imageView.image = step.image
 
     }
-
-    func showAnswerResult(isCorrect: Bool) {
-        imageView.layer.masksToBounds = true
-        imageView.layer.borderWidth = 8
-        imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self else {return}
-            self.presenter.showNextQuestionOrResults()
-            self.imageView.layer.borderWidth = 0
-            
-        }
-        yesButton.isEnabled = false
-        noButton.isEnabled = false
-    }
-
+    
     func showFinalResults() {
         blurEffect.isHidden = false
-        activityIndicator.stopAnimating()
         activityIndicator.isHidden = true
-        statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
+        presenter.statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
         let alertModel = AlertModel(
             title: "Этот раунд окончен!",
-            message: makeResultMessage(),
+            message: presenter.makeResultMessage(),
             buttonText: "Сыграть ещё раз",
             completion: { [weak self] in
                 self?.presenter.currentQuestionIndex = 0
@@ -98,37 +86,8 @@ final class MovieQuizViewController: UIViewController {
             }
         )
         alertPresenter?.show(alertModel: alertModel)
-
-        func makeResultMessage() -> String {
-            guard let statisticService = statisticService else {
-                return ""
-            }
-            let accuracy = String(format: "%.2f", statisticService.totalAccuracy)
-            let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
-            let currentGameResultLine = "Ваш результат: \(presenter.correctAnswers)\\\(presenter.questionsAmount )"
-            let bestGameCorrect = statisticService.bestGame?.correct ?? 0
-            let bestGameTotal = statisticService.bestGame?.total ?? 0
-            let bestGameDate = statisticService.bestGame?.date.dateTimeString ?? ""
-            let bestGameInfoLine = "Рекорд: \(bestGameCorrect)/\(bestGameTotal) (\(bestGameDate))"
-            let averageAccuracyLine = "Средняя точность: \(accuracy)%"
-            let resultMessage = [
-               currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-           ].joined(separator: "\n")
-            return resultMessage
-       }
-
     }
-
-    // MARK: Lifecycle:
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        presenter = MovieQuizPresenter(viewController: self)
-        imageView.layer.cornerRadius = 20
-        alertPresenter = AlertPresenter(viewController: self)
-        statisticService = StatisticServiceImpl()
-        presenter.questionFactory?.requestNextQuestion()
-        presenter.questionFactory?.loadData()
-
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        presenter.didReceiveNextQuestion(question: question)
     }
-
 }
