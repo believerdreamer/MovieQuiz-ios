@@ -1,14 +1,39 @@
 import XCTest
 @testable import MovieQuiz
 
-struct StubNetworkClient: NetworkRouting {
+class ArrayTests: XCTestCase{
+    func testGetValueInRange() throws {
+        // Given
+        let array = [1, 1, 2, 3, 5]
+        
+        // When
+        let value = array[safe: 2]
+        
+        // Then
+        XCTAssertNotNil(value)
+        XCTAssertEqual(value, 2)
+    }
     
+    func testGetValueOutOfRange() throws {
+        // Given
+        let array = [1, 1, 2, 3, 5]
+        
+        // When
+        let value = array[safe: 20]
+        
+        // Then
+        XCTAssertNil(value)
+    } 
+}
+
+struct StubNetworkClient: NetworkRouting {
+
     enum TestError: Error {
     case test
     }
-    
+
     let emulateError: Bool
-    
+
     func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
         if emulateError {
             handler(.failure(TestError.test))
@@ -16,7 +41,7 @@ struct StubNetworkClient: NetworkRouting {
             handler(.success(expectedResponse))
         }
     }
-    
+
     private var expectedResponse: Data {
         """
         {
@@ -52,17 +77,7 @@ struct StubNetworkClient: NetworkRouting {
     }
 }
 
-class ArrayTests: XCTestCase {
-    func testGetValueInRange() throws {
-        // Given
-        let array = [1, 1, 2, 3, 5]
-        // When
-        let value = array[safe: 2]
-        // Then
-        XCTAssertNotNil(value)
-        XCTAssertEqual(value, 2)
-    }
-    
+
     func testGetValueOutOfRange() throws {
         // Given
         let array = [1, 1, 2, 3, 5]
@@ -71,17 +86,17 @@ class ArrayTests: XCTestCase {
         // Then
         XCTAssertNil(value)
     }
-    
+
     class MovieLoaderTests: XCTestCase{
-        
+
         func testSuccessLoading() throws {
             // Given
-            let stubNetworkClient = StubNetworkClient(emulateError: false) // говорим, что не хотим эмулировать ошибку
+            let stubNetworkClient = StubNetworkClient(emulateError: false)
             let loader = MoviesLoader(networkClient: stubNetworkClient)
-            
+
             // When
             let expectation = expectation(description: "Loading expectation")
-            
+
             loader.loadMovies { result in
                 // Then
                 switch result {
@@ -93,18 +108,18 @@ class ArrayTests: XCTestCase {
                     XCTFail("Unexpected failure")
                 }
             }
-            
+
             waitForExpectations(timeout: 1)
         }
-        
+
         func testFailureLoading() throws {
             // Given
             let stubNetworkClient = StubNetworkClient(emulateError: true) // говорим, что хотим эмулировать ошибку
             let loader = MoviesLoader(networkClient: stubNetworkClient)
-            
+
             // When
             let expectation = expectation(description: "Loading expectation")
-            
+
             loader.loadMovies { result in
                 // Then
                 switch result {
@@ -115,8 +130,7 @@ class ArrayTests: XCTestCase {
                     XCTFail("Unexpected failure")
                 }
             }
-            
+
             waitForExpectations(timeout: 1)
         }
     }
-}

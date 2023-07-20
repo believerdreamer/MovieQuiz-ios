@@ -12,7 +12,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     init(viewController: MovieQuizViewController) {
         self.viewController = viewController
-        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(networkClient: NetworkClient()), delegate: self)
         statisticService = StatisticServiceImpl()
         viewController.showLoadingIndicator()
     }
@@ -111,9 +111,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
    }
     
     func proceedWithAnswer(isCorrect: Bool) {
-        viewController?.imageView.layer.masksToBounds = true
-        viewController?.imageView.layer.borderWidth = 8
-        viewController?.imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+        viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else {return}
             self.proceedToNextQuestionOrResults()
