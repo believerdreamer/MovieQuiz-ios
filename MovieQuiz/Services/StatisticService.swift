@@ -9,7 +9,6 @@ protocol StatisticService {
 }
 
 final class StatisticServiceImpl {
-    // MARK: Private properties:
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
     }
@@ -19,7 +18,7 @@ final class StatisticServiceImpl {
     private let encoder: JSONEncoder
     private let dateProvider: () -> Date
 
-    init( // MARK: Initializator:
+    init(
         userDefaults: UserDefaults = .standard,
         decoder: JSONDecoder = JSONDecoder(),
         encoder: JSONEncoder = JSONEncoder(),
@@ -34,7 +33,6 @@ final class StatisticServiceImpl {
 }
 
 extension StatisticServiceImpl: StatisticService {
-    // MARK: Public properties:
     var gamesCount: Int {
         get {
             userDefaults.integer(forKey: Keys.gamesCount.rawValue)
@@ -82,7 +80,7 @@ extension StatisticServiceImpl: StatisticService {
             userDefaults.set(data, forKey: Keys.bestGame.rawValue)
         }
     }
-    // MARK: Functions: 
+    
     func store(correct: Int, total: Int) {
         self.correct += correct
         self.total += total

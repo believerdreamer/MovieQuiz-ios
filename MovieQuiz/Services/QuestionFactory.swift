@@ -2,9 +2,7 @@ import Foundation
 
 class QuestionFactory: QuestionFactoryProtocol {
     private let moviesLoader: MoviesLoading
-    
     weak var delegate: QuestionFactoryDelegate?
-    
     private var movies: [MostPopularMovie] = []
 
     init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate) {
@@ -51,16 +49,17 @@ class QuestionFactory: QuestionFactoryProtocol {
             let correctAnswer: Bool
             let mainQuestion = Int.random(in: (0...10))
             if mainQuestion % 2 == 0 {
-                            text = "Рейтинг этого фильма больше чем \(ratingQuestion)?"
-                            correctAnswer = rating > ratingQuestion
-                        } else {
-                            text = "Рейтинг этого фильма меньше чем \(ratingQuestion)?"
-                            correctAnswer = rating < ratingQuestion
-                        }
+                text = "Рейтинг этого фильма больше чем \(ratingQuestion)?"
+                correctAnswer = rating > ratingQuestion
+            } else {
+                text = "Рейтинг этого фильма меньше чем \(ratingQuestion)?"
+                correctAnswer = rating < ratingQuestion
+            }
             
-            let question = QuizQuestion(image: imageData,
-                                         text: text,
-                                         correctAnswer: correctAnswer)
+            let question = QuizQuestion(
+                image: imageData,
+                text: text,
+                correctAnswer: correctAnswer)
             
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
