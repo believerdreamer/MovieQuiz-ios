@@ -44,7 +44,7 @@ class QuestionFactory: QuestionFactoryProtocol {
             }
             
             let rating = Float(movie.rating) ?? 0
-            let ratingQuestion = round(Float.random(in: 7.3...9.7) * 10) / 10
+            let ratingQuestion = round(Float.random(in: 7.3...9.3) * 10) / 10
             let text: String
             let correctAnswer: Bool
             let mainQuestion = Int.random(in: (0...10))
