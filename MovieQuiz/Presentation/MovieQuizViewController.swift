@@ -10,9 +10,6 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func hideImageBorder()
     func showIndicatorAndBlur()
     func showFinalResults()
-    var blurEffect: UIVisualEffectView! { get }
-    var activityIndicator: UIActivityIndicatorView! { get }
-    
 }
 
 // MARK: UIViewController:
@@ -26,7 +23,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet weak private var noButton: UIButton!
     @IBOutlet weak private var textLabel: UILabel!
     @IBOutlet weak private var counterLabel: UILabel!
-    @IBOutlet weak var blurEffect: UIVisualEffectView!
+    @IBOutlet weak private var blurEffect: UIVisualEffectView!
     @IBOutlet private weak var imageView: UIImageView!
     private var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
@@ -60,7 +57,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
 
     func hideLoadingIndicator() {
         activityIndicator.isHidden = true
-        activityIndicator.stopAnimating()
         blurEffect.isHidden = true
     }
     func showNetworkError(message: String) {

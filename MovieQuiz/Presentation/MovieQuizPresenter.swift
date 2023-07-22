@@ -3,7 +3,7 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
     private weak var viewController: (MovieQuizViewControllerProtocol)?
-    private let questionsAmount: Int = 10
+    private let questionsAmount: Int = 0
     private var currentQuestionIndex: Int = 9
     private var correctAnswers: Int = 0
     private var statisticService: StatisticService!
@@ -74,8 +74,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         DispatchQueue.main.async {[weak self] in
             self?.viewController?.show(quiz: viewModel)
         }
-        viewController?.activityIndicator.isHidden = true
-        viewController?.blurEffect.isHidden = true
+        viewController?.hideLoadingIndicator()
     }
     
     func proceedToNextQuestionOrResults() {

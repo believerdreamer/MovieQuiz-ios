@@ -17,11 +17,6 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
         
     }
     
-    var blurEffect: UIVisualEffectView!
-    
-    var activityIndicator: UIActivityIndicatorView!
-    
-    
     func show(quiz step: QuizStepViewModel) {}
     
     func highlightImageBorder(isCorrectAnswer: Bool) {}
