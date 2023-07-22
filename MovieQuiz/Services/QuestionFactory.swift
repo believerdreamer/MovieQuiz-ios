@@ -1,14 +1,18 @@
-import UIKit
+import Foundation
 
-final class QuestionFactory: QuestionFactoryProtocol {
-    // MARK: Private properties:
+class QuestionFactory: QuestionFactoryProtocol {
     private let moviesLoader: MoviesLoading
     private weak var delegate: QuestionFactoryDelegate?
     private var movies: [MostPopularMovie] = []
 
+    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate) {
+        self.moviesLoader = moviesLoader
+        self.delegate = delegate
+    }
+
     func loadData() {
-        moviesLoader.loadMovies { [weak self] result in
-            DispatchQueue.main.async {
+        moviesLoader.loadMovies { result in
+            DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 switch result {
                 case .success(let mostPopularMovies):
@@ -20,24 +24,28 @@ final class QuestionFactory: QuestionFactoryProtocol {
             }
         }
     }
-    // MARK: Public methods:
+    
     func requestNextQuestion() {
         DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            let index = (0..<self.movies.count).randomElement() ?? 0
-
-            guard let movie = self.movies[safe: index] else { return }
-
+            guard
+                let self = self,
+                let index = (0..<self.movies.count).randomElement(),
+                let movie = self.movies[safe: index]
+                    
+            else {
+                return
+            }
+            movies.remove(at: index)
             var imageData = Data()
-
+            
             do {
-                imageData = try Data(contentsOf: movie.resizedImageURL)
+                imageData = try Data(contentsOf: movie.imageURL)
             } catch {
                 print("Failed to load image")
             }
-
+            
             let rating = Float(movie.rating) ?? 0
-            let ratingQuestion = round(Float.random(in: 7.3...9.7) * 10) / 10
+            let ratingQuestion = round(Float.random(in: 7.3...9.3) * 10) / 10
             let text: String
             let correctAnswer: Bool
             let mainQuestion = Int.random(in: (0...10))
@@ -48,20 +56,17 @@ final class QuestionFactory: QuestionFactoryProtocol {
                 text = "Рейтинг этого фильма меньше чем \(ratingQuestion)?"
                 correctAnswer = rating < ratingQuestion
             }
+            
             let question = QuizQuestion(
                 image: imageData,
                 text: text,
                 correctAnswer: correctAnswer)
-
+            
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.delegate?.didReceiveNextQuestion(question: question)
             }
         }
     }
-
-    init(moviesLoader: MoviesLoading, delegate: QuestionFactoryDelegate?) {
-            self.moviesLoader = moviesLoader
-            self.delegate = delegate
-        }
 }
+
