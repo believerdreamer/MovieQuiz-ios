@@ -24,11 +24,11 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak private var yesButton: UIButton!
     @IBOutlet weak private var noButton: UIButton!
-    @IBOutlet private var textLabel: UILabel!
-    @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet weak private var textLabel: UILabel!
+    @IBOutlet weak private var counterLabel: UILabel!
     @IBOutlet weak var blurEffect: UIVisualEffectView!
-    @IBOutlet private var imageView: UIImageView!
-    var alertPresenter: AlertPresenter?
+    @IBOutlet private weak var imageView: UIImageView!
+    private var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
     
     // MARK: Lifecycle:
