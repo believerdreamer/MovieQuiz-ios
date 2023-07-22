@@ -9,16 +9,15 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func disableButtons()
     func hideImageBorder()
     func showIndicatorAndBlur()
-    func showFinalResults()
+    func showFinalResults(alertModel: AlertModel)
 }
 
 // MARK: UIViewController:
 
 final class MovieQuizViewController: UIViewController, MovieQuizViewControllerProtocol {
-
     // MARK: IBOutlet:
     
-    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet weak private var activityIndicator: UIActivityIndicatorView!
     @IBOutlet weak private var yesButton: UIButton!
     @IBOutlet weak private var noButton: UIButton!
     @IBOutlet weak private var textLabel: UILabel!
@@ -35,7 +34,7 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         alertPresenter = AlertPresenter(viewController: self)
         presenter = MovieQuizPresenter(viewController: self)
         presenter.gameBeginning()
-
+        
     }
     
     // MARK: Actions:
@@ -43,18 +42,18 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     @IBAction private func noButtonClicked(_ sender: Any) {
         presenter.noButtonClicked()
     }
-
+    
     @IBAction private func yesButtonClicked(_ sender: Any) {
         presenter.yesButtonClicked()
     }
-
+    
     // MARK: Functions:
     func showLoadingIndicator() {
         activityIndicator.isHidden = false
         activityIndicator.startAnimating()
         blurEffect.isHidden = false
     }
-
+    
     func hideLoadingIndicator() {
         activityIndicator.isHidden = true
         blurEffect.isHidden = true
@@ -72,32 +71,24 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
         )
         alertPresenter?.show(alertModel: networkErrorAlert)
     }
-
+    
     func show (quiz step: QuizStepViewModel) {
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         imageView.image = step.image
-
+        
     }
     
-    func showFinalResults() {
+    func showFinalResults(alertModel: AlertModel) {
         blurEffect.isHidden = false
         activityIndicator.isHidden = true
-        let alertModel = AlertModel(
-            title: "Этот раунд окончен!",
-            message: presenter.makeResultMessage(),
-            buttonText: "Сыграть ещё раз",
-            completion: { [weak self] in
-                self?.presenter.restartGame()
-            }
-        )
-        alertPresenter?.show(alertModel: alertModel)
+        alertPresenter?.show(alertModel: presenter.createAlertModel())
     }
     func highlightImageBorder(isCorrectAnswer: Bool) {
-           imageView.layer.masksToBounds = true
-           imageView.layer.borderWidth = 8
-           imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
-       }
+        imageView.layer.masksToBounds = true
+        imageView.layer.borderWidth = 8
+        imageView.layer.borderColor = isCorrectAnswer ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
+    }
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
     }

@@ -3,8 +3,8 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
     private weak var viewController: (MovieQuizViewControllerProtocol)?
-    private let questionsAmount: Int = 0
-    private var currentQuestionIndex: Int = 9
+    private let questionsAmount: Int = 10
+    private var currentQuestionIndex: Int = 0
     private var correctAnswers: Int = 0
     private var statisticService: StatisticService!
     private var questionFactory: QuestionFactoryProtocol?
@@ -79,7 +79,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func proceedToNextQuestionOrResults() {
         if self.isLastQuestion() {
-            viewController?.showFinalResults()
+            viewController?.showFinalResults(alertModel:
+                AlertModel(title: "Этот раунд окончен!",
+                message: makeResultMessage(),
+                buttonText: "Сыграть ещё раз",
+                completion: {[weak self] in
+                self?.restartGame()
+                
+            }))
+            
         } else {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
@@ -100,10 +108,10 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         let bestGameInfoLine = "Рекорд: \(bestGameCorrect)/\(bestGameTotal) (\(bestGameDate))"
         let averageAccuracyLine = "Средняя точность: \(accuracy)%"
         let resultMessage = [
-           currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
-       ].joined(separator: "\n")
+            currentGameResultLine, totalPlaysCountLine, bestGameInfoLine, averageAccuracyLine
+        ].joined(separator: "\n")
         return resultMessage
-   }
+    }
     
     func proceedWithAnswer(isCorrect: Bool) {
         viewController?.highlightImageBorder(isCorrectAnswer: isCorrect)
@@ -119,6 +127,17 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         statisticService = StatisticServiceImpl()
         questionFactory?.requestNextQuestion()
         questionFactory?.loadData()
+    }
+    
+    func createAlertModel() -> AlertModel{
+        let alertModel = AlertModel(
+            title: "Этот раунд окончен!",
+            message: makeResultMessage(),
+            buttonText: "Сыграть ещё раз",
+            completion: {[weak self] in
+                self?.restartGame()
+            })
+        return alertModel
     }
 }
 
