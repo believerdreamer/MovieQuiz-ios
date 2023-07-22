@@ -87,14 +87,11 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     func showFinalResults() {
         blurEffect.isHidden = false
         activityIndicator.isHidden = true
-        presenter.statisticService?.store(correct: presenter.correctAnswers, total: presenter.questionsAmount)
         let alertModel = AlertModel(
             title: "Этот раунд окончен!",
             message: presenter.makeResultMessage(),
             buttonText: "Сыграть ещё раз",
             completion: { [weak self] in
-                self?.presenter.currentQuestionIndex = 0
-                self?.presenter.correctAnswers = 0
                 self?.presenter.restartGame()
             }
         )

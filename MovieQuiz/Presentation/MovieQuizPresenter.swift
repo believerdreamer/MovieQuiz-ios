@@ -3,8 +3,8 @@ import UIKit
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
     private weak var viewController: (MovieQuizViewControllerProtocol)?
-    let questionsAmount: Int = 10
-    var currentQuestionIndex: Int = 0
+    private let questionsAmount: Int = 10
+    private var currentQuestionIndex: Int = 9
     var correctAnswers: Int = 0
     var statisticService: StatisticService!
     private var questionFactory: QuestionFactoryProtocol?
@@ -40,6 +40,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     func restartGame() {
+        statisticService?.store(correct: correctAnswers, total: questionsAmount)
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
