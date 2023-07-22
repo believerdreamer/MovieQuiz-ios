@@ -2,15 +2,14 @@ import UIKit
 
 final class MovieQuizPresenter: QuestionFactoryDelegate {
     private var currentQuestion: QuizQuestion?
-    private var alertPresenter: AlertPresenter?
-    private weak var viewController: MovieQuizViewController?
+    private weak var viewController: (MovieQuizViewControllerProtocol)?
     let questionsAmount: Int = 10
     var currentQuestionIndex: Int = 0
     var correctAnswers: Int = 0
     var statisticService: StatisticService!
-    var questionFactory: QuestionFactoryProtocol?
+    private var questionFactory: QuestionFactoryProtocol?
     
-    init(viewController: MovieQuizViewController) {
+    init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         questionFactory = QuestionFactory(moviesLoader: MoviesLoader(networkClient: NetworkClient()), delegate: self)
         statisticService = StatisticServiceImpl()
@@ -20,8 +19,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didLoadDataFromServer() {
         questionFactory?.requestNextQuestion()
-        viewController?.activityIndicator.isHidden = false
-        viewController?.blurEffect.isHidden = false
+        viewController?.showIndicatorAndBlur()
     }
     
     func didFailToLoadData(with error: Error) {
@@ -61,7 +59,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     
     func didAnswer(isYes: Bool) {
         guard let currentQuestion = currentQuestion else {return}
-        if isYes{
+        if currentQuestion.correctAnswer == isYes{
             correctAnswers += 1
         }
         
@@ -86,10 +84,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
-        viewController?.yesButton.isEnabled = true
-        viewController?.noButton.isEnabled = true
-        viewController?.showLoadingIndicator()
-        viewController?.blurEffect.isHidden = false
+        viewController?.showIndicatorAndBlur()
         
     }
     func makeResultMessage() -> String {
@@ -115,11 +110,15 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else {return}
             self.proceedToNextQuestionOrResults()
-            self.viewController?.imageView.layer.borderWidth = 0
-            
+            viewController?.hideImageBorder()
         }
-        viewController?.yesButton.isEnabled = false
-        viewController?.noButton.isEnabled = false
+        viewController?.disableButtons()
+    }
+    
+    func gameBeginning(){
+        statisticService = StatisticServiceImpl()
+        questionFactory?.requestNextQuestion()
+        questionFactory?.loadData()
     }
 }
 

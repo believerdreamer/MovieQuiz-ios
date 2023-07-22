@@ -6,6 +6,13 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func showLoadingIndicator()
     func hideLoadingIndicator()
     func showNetworkError(message: String)
+    func disableButtons()
+    func hideImageBorder()
+    func showIndicatorAndBlur()
+    func showFinalResults()
+    var blurEffect: UIVisualEffectView! { get }
+    var activityIndicator: UIActivityIndicatorView! { get }
+    
 }
 
 // MARK: UIViewController:
@@ -15,24 +22,22 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     // MARK: IBOutlet:
     
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
-    @IBOutlet weak var yesButton: UIButton!
-    @IBOutlet weak var noButton: UIButton!
+    @IBOutlet weak private var yesButton: UIButton!
+    @IBOutlet weak private var noButton: UIButton!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet weak var blurEffect: UIVisualEffectView!
-    @IBOutlet var imageView: UIImageView!
-    private var alertPresenter: AlertPresenter?
+    @IBOutlet private var imageView: UIImageView!
+    var alertPresenter: AlertPresenter?
     private var presenter: MovieQuizPresenter!
     
     // MARK: Lifecycle:
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter(viewController: self)
-        presenter.statisticService = StatisticServiceImpl()
-        presenter.questionFactory?.requestNextQuestion()
-        presenter.questionFactory?.loadData()
+        presenter = MovieQuizPresenter(viewController: self)
+        presenter.gameBeginning()
 
     }
     
@@ -65,7 +70,6 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
             buttonText: "Попробовать ещё раз",
             completion: {[weak self] in
                 guard let self = self else {return}
-                presenter.questionFactory?.loadData()
                 self.presenter.restartGame()
                 showLoadingIndicator()
             }
@@ -103,5 +107,21 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
        }
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
+    }
+    
+    func showIndicatorAndBlur(){
+        yesButton.isEnabled = true
+        noButton.isEnabled = true
+        showLoadingIndicator()
+        blurEffect.isHidden = false
+    }
+    
+    func disableButtons(){
+        yesButton.isEnabled = false
+        noButton.isEnabled = false
+    }
+    
+    func hideImageBorder(){
+        self.imageView.layer.borderWidth = 0
     }
 }

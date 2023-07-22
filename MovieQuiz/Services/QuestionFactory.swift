@@ -31,10 +31,11 @@ class QuestionFactory: QuestionFactoryProtocol {
                 let self = self,
                 let index = (0..<self.movies.count).randomElement(),
                 let movie = self.movies[safe: index]
+                    
             else {
                 return
             }
-            
+            movies.remove(at: index)
             var imageData = Data()
             
             do {

@@ -2,6 +2,25 @@ import XCTest
 @testable import MovieQuiz
 
 final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
+    func disableButtons() {
+    }
+    
+    func hideImageBorder() {
+        
+    }
+    
+    func showIndicatorAndBlur() {
+        
+    }
+    
+    func showFinalResults() {
+        
+    }
+    
+    var blurEffect: UIVisualEffectView!
+    
+    var activityIndicator: UIActivityIndicatorView!
+    
     
     func show(quiz step: QuizStepViewModel) {}
     
@@ -17,7 +36,7 @@ final class MovieQuizViewControllerMock: MovieQuizViewControllerProtocol {
 
 class MovieQuizPresenterTests: XCTestCase {
     func testPresenterConvertModel() throws {
-        let viewControllerMock = MovieQuizViewController()
+        let viewControllerMock = MovieQuizViewControllerMock()
         let sut = MovieQuizPresenter(viewController: viewControllerMock)
         
         let emptyData = Data()

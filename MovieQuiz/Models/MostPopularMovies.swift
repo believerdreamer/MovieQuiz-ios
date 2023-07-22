@@ -1,11 +1,11 @@
 import Foundation
 
-struct MostPopularMovies: Codable {
+struct MostPopularMovies: Codable, Hashable {
     let errorMessage: String
     let items: [MostPopularMovie]
 }
 
-struct MostPopularMovie: Codable {
+struct MostPopularMovie: Codable, Hashable {
     let title: String
     let rating: String
     let imageURL: URL
